@@ -66,6 +66,6 @@ def multiclass_expansion(sample, key, ids, rebalancing=True):
     sample[key+'_mask'] = msks
     # Rebalancing.
     if rebalancing:
-        wmsk = transform.rebalance_class(lbl)
-        wmsk = np.tile(wmsk, (len(ids),1,1,1))
-        sample[key+'_mask'] *= wmsk
+        wmsk = transform.rebalance_class(lbl,msk)
+        wmsk = np.tile(wmsk, (N,1,1,1))
+        sample[key+'_mask'] = sample[key+'_mask'] * wmsk

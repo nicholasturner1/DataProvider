@@ -398,6 +398,11 @@ def affinitize_mask(msk, dst=(1,1,1), dtype='float32'):
 def rebalance_class(img, msk=None, dtype='float32'):
     """Multiclass rebalancing."""
     img = check_volume(img)
+
+    if msk is not None:
+      msk = check_volume(msk)
+      bool_msk = (msk != 0) #0 also maps to False if boolean already
+
     ret = np.zeros(img.shape, dtype=dtype)
 
     masked = img if msk is None else img[msk>0]
