@@ -259,17 +259,27 @@ def affinitize_mask(msk, dtype='float32'):
 ## Rebalancing
 ####################################################################
 
-def rebalance_class(img, dtype='float32'):
+def rebalance_class(img, msk=None, dtype='float32'):
     """
     TODO(kisuk): Documentation.
     """
     img = check_volume(img)
+
+    if msk is not None:
+      msk = check_volume(msk)
+      bool_msk = (msk != 0) #0 also maps to False if boolean already
+
     ret = np.zeros(img.shape, dtype=dtype)
 
     num_lbls = list()
     unique_lbl = np.unique(img)
     for lbl in unique_lbl:
-        num_lbl = np.count_nonzero(img==lbl)
+
+        if msk is not None:
+            num_lbl = np.count_nonzero((img == lbl) & bool_msk )
+        else:
+            num_lbl = np.count_nonzero(img==lbl)
+
         num_lbls.append(num_lbl)
     assert(len(num_lbls)>0)
 
