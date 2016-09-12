@@ -415,7 +415,9 @@ def rebalance_class(img, msk=None, dtype='float32'):
         #   but not sure about how reasonable this value (0.5) is, and about
         #   if this can also be applied to multiclass case (e.g. semantic
         #   segmentation).
-        ret[:] = 0.5
+        #NTedit: I don't think it is reasonable for this case, modifying for now
+        #ret[:] = 0.5
+        ret[:] = 0.
     else:
         weights = 1.0/num_lbls
         weights = weights/np.sum(weights)
