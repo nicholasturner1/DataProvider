@@ -133,10 +133,10 @@ if __name__ == "__main__":
 
     # Test.
     ret = aug.prepare(spec, imgs=['input/p3','input/p2','input/p1'])
-    print ret
-    print aug.spec
-    print aug.rot
-    print aug.shear
-    print aug.scale
-    print aug.stretch
-    print aug.twist
+    print(ret)
+    print(aug.spec)
+    print(aug.rot)
+    print(aug.shear)
+    print(aug.scale)
+    print(aug.stretch)
+    print(aug.twist)

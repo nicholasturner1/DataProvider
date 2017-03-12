@@ -15,7 +15,7 @@ import numpy as np
 # except ImportError:
 #     raise RuntimeError('_warping.so Cython extension not found.\n'
 #                        'Please run setup.py or manually cythonize _warping.pyx.')
-from _warping import warp2dFast, warp3dFast, _warp2dFastLab, _warp3dFastLab
+from ._warping import warp2dFast, warp3dFast, _warp2dFastLab, _warp3dFastLab
 
 
 def warp2dJoint(img, lab, patch_size, rot, shear, scale, stretch):
@@ -240,7 +240,7 @@ def getWarpParams(patch_size, amount=1.0, **kwargs):
     To be called from CNNData. Get warping parameters + required warping input patch size.
     """
     if amount > 1:
-        print 'WARNING: warpAugment amount > 1 this requires more than 1.4 bigger patches before warping'
+        print('WARNING: warpAugment amount > 1 this requires more than 1.4 bigger patches before warping')
     rot_max = 15 * amount
     shear_max = 3 * amount
     scale_max = 1.2 * amount
@@ -288,8 +288,8 @@ def test():
         img_s = np.concatenate((img_s[None], np.exp(img_s[None])), axis=0)
         out = warp2dFast(img_s, (11, 11), 0, 0, (1, 1), (0.0, 0.0))
     except Exception as e:
-        print """%s
-        Warping is broken. Most likeley the distributed _warping.so is not binary compatible to your system.""" % (e, )
+        print("""%s
+        Warping is broken. Most likeley the distributed _warping.so is not binary compatible to your system.""" % (e, ))
 
 
 test()
@@ -427,4 +427,4 @@ if __name__ == "__main__":
         t0 = time.time()
         wow1 = warp3dFast(test[None], (s, s, s), 20, 5, (1, 1, 1), (0.1, 0.1, 0.1, 0.1), 10)
         #wow1 = warp3dFast(test[None], (s,s,s))
-        print time.time() - t0
+        print(time.time() - t0)
