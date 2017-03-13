@@ -128,7 +128,7 @@ def getCornerIx(sh):
     sh = np.array(sh) - 1  ###TODO
     n_dim = len(sh)
     ix = []
-    for i in xrange(2**n_dim):
+    for i in range(2**n_dim):
         ix.append(getGrayCode(i, n_dim))
 
     ix = np.array(ix)
@@ -344,7 +344,7 @@ if __name__ == "__main__":
         ext_size, rot, shear, scale, stretch, twist = getWarpParams(ps,
                                                                     amount=1.0)
         t = []
-        for i in xrange(10000):
+        for i in range(10000):
             ext_size, rot, shear, scale, stretch, twist = getWarpParams(ps, amount=1.0); t.append(ext_size)
     #  img_in = maketestimage(eff_size)
     #  img_in = paddImage(img_in, ext_size, left_exc)[None]
@@ -398,10 +398,10 @@ if __name__ == "__main__":
 
         img1, lab1 = warpAugment(img_s[None], lab, patch_size=patch_size)
 
-        for i in xrange(n):
+        for i in range(n):
             plt.imsave('/tmp/%i-img.png' % i, img1[0, i, :, :] / 255)
 
-        for i in xrange(lab1.shape[0]):
+        for i in range(lab1.shape[0]):
             plt.imsave('/tmp/%i-lab.png' % (i + off), lab1[i, :, :])
 
     if False:  # visual 3d
@@ -412,12 +412,12 @@ if __name__ == "__main__":
 
         wow1 = warp3dFast(img_s[None], (s1, s2, n), 0, 0, (1, 1, 1),
                           (0.1, 0.1, 0.1, -0.1), 10)
-        for i in xrange(n):
+        for i in range(n):
             plt.imsave('/tmp/%i-ref.png' % i, wow1[:, :, i] / 255)
 
         wow2 = _warp3dFastLab(img_s[20:-20, 20:-20], (s1 - 40, s2 - 40, n),
                               (s1, s2, n), 0, 0, (1, 1, 1), (0.1, 0.1, 0.1, -0.1), 10)
-        for i in xrange(wow2.shape[2]):
+        for i in range(wow2.shape[2]):
             plt.imsave('/tmp/%i.png' % i, wow2[:, :, i] / 255)
 
     if False:  # 3d timing

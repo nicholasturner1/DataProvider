@@ -131,7 +131,7 @@ def centered_box(c, s):
     """Return a box of size s centered on c."""
     center = Vec3d(c)
     size   = Vec3d(s)
-    half   = size/2
+    half   = size//2
     assert size.x >= 0 and size.y >= 0 and size.z >= 0
     v1 = center - half
     v2 = v1 + size

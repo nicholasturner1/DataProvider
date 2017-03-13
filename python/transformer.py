@@ -53,7 +53,7 @@ class Affinity(Transformer):
         msk = np.concatenate(msks, axis=0)
         # Rebalancing.
         if self.rebalance:
-            for c in xrange(aff.shape[0]):
+            for c in range(aff.shape[0]):
                 msk[c,...] *= tf.rebalance_binary_class(aff[c,...], msk=msk[c,...])
         # Update sample.
         sample[self.target] = aff
