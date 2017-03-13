@@ -6,7 +6,7 @@ DataSpecParser class.
 Kisuk Lee <kisuklee@mit.edu>, 2016
 """
 
-import ConfigParser
+import configparser
 
 from vector import Vec3d
 
@@ -36,13 +36,12 @@ class Parser(object):
         # Set dataset-specific params.
         self.dparams = self._parse_dataset_params(config)
 
-
     def parse_dataset(self, dataset_id):
         """
-        TODO(kisuk): Documentation.
+        Parse each dataset specified by data spec.
 
         Args:
-            dataset_id:
+            dataset_id
 
         Returns:
             dataset: ConfigParser object containing dataset info.
@@ -76,7 +75,7 @@ class Parser(object):
 
     def parse_data(self, config, name, data, idx):
         """
-        TODO(kisuk): Documentation.
+        Parse each data volume of the dataset being parsed.
 
         Args:
             config:
@@ -253,7 +252,7 @@ if __name__ == "__main__":
     p = Parser(dspec_path, net_spec, params)
     config, dparams = p.parse_dataset(0)
     assert dparams['dataset_id']==0
-    print dparams
+    print(dparams)
     f = open('zfish_dataset0.spec', 'w')
     config.write(f)
     f.close()

@@ -10,6 +10,7 @@ import numpy as np
 
 import box
 from tensor import WritableTensorData as WTD, WritableTensorDataWithMask as WTDM
+import time
 
 def prepare_outputs(spec, locs, blend=False, blend_mode=''):
     blend_pool = ['','bump']
@@ -84,6 +85,8 @@ class BumpBlend(Blend):
         """Initialize BumpBlend."""
         Blend.__init__(self, spec, locs, blend)
 
+        self.logit_maps = dict()
+
         # Inference with overlapping window.
         self.max_logits = None
         if blend:
@@ -104,8 +107,12 @@ class BumpBlend(Blend):
         """Blend with data."""
         for k, v in sample.iteritems():
             assert k in self.data
+            t0 = time.time()
             mask = self._get_mask(k, loc)
+            t1 = time.time() - t0
             self.data[k].set_patch(loc, v, op=self.op, mask=mask)
+            t2 = time.time() - t0
+            print 'get_mask: %.3f, set_patch: %.3f' % (t1, t2-t1)
 
     ####################################################################
     ## Private methods.
@@ -123,14 +130,18 @@ class BumpBlend(Blend):
         return -(x*(1-x))**(-t)-(y*(1-y))**(-t)-(z*(1-z))**(-t)
 
     def _bump_logit_map(self, dim):
-        x = range(dim[-1])
-        y = range(dim[-2])
-        z = range(dim[-3])
-        zv, yv, xv = np.meshgrid(z, y, x, indexing='ij')
-        xv = (xv+1.0)/(dim[-1]+1.0)
-        yv = (yv+1.0)/(dim[-2]+1.0)
-        zv = (zv+1.0)/(dim[-3]+1.0)
-        return self._bump_logit(zv, yv, xv)
+        ret = self.logit_maps.get(dim)
+        if ret is None:
+            x = range(dim[-1])
+            y = range(dim[-2])
+            z = range(dim[-3])
+            zv, yv, xv = np.meshgrid(z, y, x, indexing='ij')
+            xv = (xv+1.0)/(dim[-1]+1.0)
+            yv = (yv+1.0)/(dim[-2]+1.0)
+            zv = (zv+1.0)/(dim[-3]+1.0)
+            ret = self._bump_logit(zv, yv, xv)
+            self.logit_maps[dim] = ret
+        return ret
 
     def _bump_map(self, dim, max_logit):
         return np.exp(self._bump_logit_map(dim) - max_logit)

@@ -47,6 +47,9 @@ class Box(object):
     def size(self):
         return Vec3d(self._size)
 
+    def volume(self):
+        return self._size[0]*self._size[1]*self._size[2]
+
     def contains(self, v):
         """Return true if a point is inside the box."""
         (x,y,z) = Vec3d(v)
@@ -128,7 +131,7 @@ def centered_box(c, s):
     """Return a box of size s centered on c."""
     center = Vec3d(c)
     size   = Vec3d(s)
-    half   = size/2
+    half   = size//2
     assert size.x >= 0 and size.y >= 0 and size.z >= 0
     v1 = center - half
     v2 = v1 + size

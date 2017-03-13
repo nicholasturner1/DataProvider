@@ -11,6 +11,8 @@ import numpy as np
 
 from box import *
 from vector import *
+import time
+
 
 class TensorData(object):
     """Read-only tensor data.
@@ -121,7 +123,7 @@ class TensorData(object):
 
     def _set_range(self):
         """Set a valid range for extracting patches."""
-        top  = self._fov/2                # Top margin
+        top  = self._fov//2               # Top margin
         btm  = self._fov - top - (1,1,1)  # Bottom margin
         vmin = self._offset + top
         vmax = self._offset + self._dim - btm
@@ -166,9 +168,9 @@ class WritableTensorData(TensorData):
         lval = 'self._data[:,vmin[0]:vmax[0],vmin[1]:vmax[1],vmin[2]:vmax[2]]'
         rval = 'patch'
         if op is None:
-            exec '{}={}'.format(lval, rval)
+            exec('{}={}'.format(lval, rval))
         else:
-            exec '{}={}({},{})'.format(lval, op, lval, rval)
+            exec('{}={}({},{})'.format(lval, op, lval, rval))
 
 
 class WritableTensorDataWithMask(WritableTensorData):
@@ -193,15 +195,24 @@ class WritableTensorDataWithMask(WritableTensorData):
         if mask is None:
             mask = np.ones(patch.shape, dtype='float32')
         # Set patch.
-        WritableTensorData.set_patch(self, pos, mask*patch, op)
+        t0 = time.time()
+        masked = mask*patch
+        t1 = time.time() - t0
+        WritableTensorData.set_patch(self, pos, masked, op)
+        t2 = time.time() - t0
         # Set normalization.
         self._norm.set_patch(pos, mask, op='np.add')
+        t3 = time.time() - t0
+        print('mask*patch: %.3f, set_patch: %.3f, set_mask: %.3f' % (t1, t2-t1, t3-t2))
 
     def get_norm(self):
         return self._norm._data
 
     def get_data(self):
-        return self._data/self._norm._data
+        # return self._data/self._norm._data
+        # Temporary in-place normalization.
+        self._data = np.divide(self._data, self._norm._data, self._data)
+        return self._data
 
     def get_unnormalized_data(self):
         return WritableTensorData.get_data(self)
