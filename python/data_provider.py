@@ -9,7 +9,7 @@ Kisuk Lee <kisuklee@mit.edu>, 2015-2016
 from collections import OrderedDict
 import numpy as np
 import parser
-from dataset import VolumeDataset
+from dataset import VolumeDataset, SampleDataset
 from data_augmentation import DataAugmentor
 from transform import *
 from label_transform import *
@@ -24,6 +24,74 @@ class DataProvider(object):
 
     def random_sample(self):
         raise NotImplementedError
+
+
+class BatchDataProvider(DataProvider):
+    """
+    DataProvider for samples.
+
+    Attributes:
+        datasets: List of datasets.
+    """
+
+    def __init__(self, dsets, layer_types, net_spec, preps, xforms, augs):
+        """
+        Initialize DataProvider.
+
+        Args:
+            dspec_path: Path to the dataset specification file.
+            net_spec:   Net specification.
+            params:     Various options.
+            auto_mask:  Whether to automatically generate mask from
+                        corresponding label.
+        """
+
+        self.datasets = list()
+        for d in dsets:
+            dataset = SampleDataset(d, layer_types, net_spec, preps, xforms)
+            self.datasets.append(dataset)
+            
+        self._data_aug = DataAugmentor(augs)
+
+    def next_sample(self):
+        """Fetch next sample in a sample sequence."""
+        return self.random_sample()  # TODO(kisuk): Temporary.
+
+    def random_sample(self):
+        """Fetch a batch of randomly augmented samples."""
+
+        for dset in self.datasets:
+            # Draw a random sample and apply data augmenation.
+            sample, transform = self._data_aug.random_sample(dset)
+            # Transform sample.
+            sample = self._transform(sample, transform)
+
+            samples.append(OrderedDict(sorted(sample.items(), key=lambda k: k)))
+
+        #merging samples to form a batch
+        self._make_batch(samples)
+
+
+    def _make_batch(self, samples):
+
+        assert(len(samples) >= 1)
+
+        keys = samples[0].keys()
+
+        #I should rewrite this when I get more sleep
+        batch = OrderedDict()
+        for k in keys:
+            batch_samples = list()
+
+            for sample in samples:
+                sample_d = sample[k]
+                sample_d = check_tensor(sample_d)
+                sample_d = np.transpose(sample_d,(1,2,3,0))[np.newaxis,:]
+                batch_samples.append(sample_d)
+
+            batch[k] = np.concatenate(batch_samples,axis=0)
+
+        return batch
 
 
 class VolumeDataProvider(DataProvider):
@@ -53,11 +121,11 @@ class VolumeDataProvider(DataProvider):
         dprior = params.get('dprior', None)  # Optional.
 
         # Build Datasets.
-        print '\n[VolumeDataProvider]'
+        print('\n[VolumeDataProvider]')
         p = parser.Parser(dspec_path, net_spec, params, auto_mask=auto_mask)
         self.datasets = list()
         for d in drange:
-            print 'constructing dataset %d...' % d
+            print('constructing dataset %d...' % d)
             config, dparams = p.parse_dataset(d)
             dataset = VolumeDataset(config, **dparams)
             self.datasets.append(dataset)

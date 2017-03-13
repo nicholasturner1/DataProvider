@@ -6,7 +6,7 @@ DataSpecParser class.
 Kisuk Lee <kisuklee@mit.edu>, 2016
 """
 
-import ConfigParser
+import configparser
 
 from vector import Vec3d
 
@@ -252,7 +252,7 @@ if __name__ == "__main__":
     p = Parser(dspec_path, net_spec, params)
     config, dparams = p.parse_dataset(0)
     assert dparams['dataset_id']==0
-    print dparams
+    print(dparams)
     f = open('zfish_dataset0.spec', 'w')
     config.write(f)
     f.close()

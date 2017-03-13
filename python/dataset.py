@@ -126,6 +126,9 @@ class SampleDataset(Dataset):
 
         return sample, transform
 
+    def get_imgs(self):
+        return copy.deepcopy(self._image)
+
     ####################################################################
     ## Private Helper Methods
     ####################################################################
